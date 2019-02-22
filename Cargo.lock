@@ -1,0 +1,4 @@
+[[package]]
+name = "hello-rust-server"
+version = "0.1.0"
+
