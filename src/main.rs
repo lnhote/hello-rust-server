@@ -26,9 +26,16 @@ fn handle_connection(mut stream: TcpStream) {
     // the U+FFFD REPLACEMENT CHARACTER
     println!("Request: {}", String::from_utf8_lossy(&buf[..]));
 
-    // write a response
-    let html = fs::read_to_string("index.html").unwrap();
-    let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", html);
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+    if buf.starts_with(b"GET / HTTP/1.1\r\n") {
+        // write a response
+        let html = fs::read_to_string("index.html").unwrap();
+        let response = format!("HTTP/1.1 200 OK\r\n\r\n{}", html);
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+    } else {
+        let status_line = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+        let response = format!("{}{}", status_line, fs::read_to_string("404.html").unwrap());
+        stream.write(response.as_bytes()).unwrap();
+        stream.flush().unwrap();
+    }
 }
